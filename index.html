@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="js/vue/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/vue/vue-resource.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/vue/vue-router.js" type="text/javascript" charset="utf-8"></script>
+		
+		<link rel="stylesheet" type="text/css" href="js/swiper/swiper.min.css"/>
+		
+		
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			ul{
+				list-style: none;
+				
+			}
+			a{
+				color: black;
+				text-decoration: none;
+			}
+			
+			.content{
+				padding-top: 44px;
+				padding-bottom: 49px;
+				background-color: #f1f1f1;
+			}
+			
+			.slider img{
+				width: 100%;
+			}
+			
+			
+		</style>
+		
+		<style type="text/css">
+			.list-item{
+				padding: 10px;
+				background-color: white;
+				margin-bottom: 20px;
+				border-top: 1px solid #ddd;
+				border-bottom: 1px solid #ddd;
+			}
+			.list-item img{
+				width: 100%;
+			}
+			.cell-category{
+				text-align: center;
+				font-size: 12px;
+				color: #666;
+			}
+			.cell-title{
+				padding-top: 8px;
+				padding-bottom: 3px;
+			}
+			.cell-author{
+				padding-top: 2px;
+				padding-bottom: 5px;
+				font-size: 12px;
+				color: #666;
+			}
+			.cell-forward{
+				font-size: 12px;
+				color: #666;
+				padding-bottom: 5px;
+			}
+			.cell-info{
+				font-size: 11px;
+				color: #666;
+			}
+		</style>
+		
+		<style type="text/css">
+			.swiper-container{
+				width: 100%;
+				margin: 0 auto;
+			}
+			
+			.swiper-container img{
+				width: 100%;
+				height: 200px;
+			}
+		</style>
+		
+		<link rel="stylesheet" type="text/css" href="component/navigation.css"/>
+		<script src="component/navigation.js" type="text/javascript" charset="utf-8"></script>
+		
+		<link rel="stylesheet" type="text/css" href="component/tabbar.css"/>
+		<script src="component/tabbar.js" type="text/javascript" charset="utf-8"></script>
+		
+	</head>
+	<body>
+		
+		<div id="app">
+			<!--导航栏-->
+			<navigation left-image="img/search.png" title="首页" right-image="img/user.png"></navigation>
+			
+			
+			<!--页面容器-->
+			<div class="content">
+				
+				
+				<!--轮播图-->
+				<!--swiper容器-->
+				<div class="swiper-container">
+					<!--轮播图的组件-->
+					<div class="swiper-wrapper">
+						<div v-for="item in adsList" class="swiper-slide"  v-on:click="dealClick(item.id,item.category)">
+							<img v-bind:src="imagePrefix+item.img_url" alt="" />
+						</div>
+									
+					</div>
+					<!--分页组件-->
+					<div class="swiper-pagination"></div>
+				</div>
+		
+		
+		
+				<!--列表-->
+				<div class="list">
+					<div class="list-item" v-for="item in list" v-on:click="dealClick(item.id,item.category)">
+						
+						<p class="cell-category">- {{getChineseCategory(item.category)}} -</p>
+						<p class="cell-title">{{item.title}}</p>
+						<p class="cell-author">作者:{{item.author_name}}</p>
+						<p class="cell-img"><img v-bind:src="imagePrefix+item.img_url"/></p>
+						<p class="cell-forward">{{item.forward}}</p>
+						<p class="cell-info">发布时间: {{item.post_date}} 喜欢:{{item.like_count}}</p>
+						
+						
+					</div>
+				</div>
+			</div>
+				
+			<!--标签栏-->
+			<tabbar index="0"></tabbar>
+		</div>
+		
+		<script src="js/interface/interface.js" type="text/javascript" charset="utf-8"></script>
+		<!--引入swiper js文件-->
+		<script src="js/swiper/swiper.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			
+			var data = {
+				message:"12",
+				list:[],
+				adsList:[],
+				imagePrefix:imagePrefix
+			}
+			
+			var app = new Vue({
+				el:"#app",
+				data:data,
+				created:function () {
+					
+					
+					//下载列表数据
+					this.$http
+						.get(mainListUrl)
+						.then(function (r) {
+						var  downloadData = r.data;
+						this.list = downloadData.data;
+					})
+						
+					//下载轮播数据
+					this.$http
+						.get(adsUrl)
+						.then(function (r) {
+						var downloadData = r.data;
+						this.adsList = downloadData.data;
+						
+						//开启轮播
+						//	next下一步
+						//	tick时钟
+						//	等待上一个渲染操作完成
+						Vue.nextTick(function () {
+							//创建初始化轮播图对象
+							//参数1：轮播对象的选择器
+							//参数2：轮播图选项
+							var mySwiper = new Swiper(".swiper-container",{
+								//是否可以循环
+								loop:true,
+								//自动切换时间
+								autoplay: 1000,
+								//控制分页组件
+								pagination: ".swiper-pagination",
+								//控制分页按钮
+								paginationClickable:true,
+								//点击之后，还可以自动播放
+								autoplayDisableOnInteraction:false,
+							});
+						})
+					})
+					
+				},
+				methods:{
+					getChineseCategory:function(c){
+						var dict = {
+							"1":"阅读",
+							"4":"音乐",
+							"5":"影视"
+						}
+						return dict[c];
+					},
+					dealClick:function (id,c) {
+						//alert(id+" "+c)
+						
+						
+						
+						//页面传参
+						//(1)	cookie
+						//(2)	url  index.html?a=10
+						//(3)	sessionStorage
+						//(4)	vue路由传参
+						sessionStorage.id = id;
+						
+						//页面跳转
+						var dict = {
+							"1":"readDetail.html",
+							"4":"musicDetail.html",
+							"5":"movieDetail.html"
+						}
+						var page = dict[c];
+						location.href = page;
+					}
+				}
+			})
+			
+			
+		</script>
+		
+	</body>
+</html>

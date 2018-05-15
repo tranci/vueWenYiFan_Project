@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="js/vue/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/vue/vue-resource.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/vue/vue-router.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			ul{
+				list-style: none;
+				
+			}
+			a{
+				color: black;
+				text-decoration: none;
+			}
+			
+			.content{
+				padding-top: 44px;
+				padding-bottom: 49px;
+			}
+			
+			.slider img{
+				width: 100%;
+			}
+			
+			.list-item{
+				padding: 10px;
+			}
+			.list-item img{
+				width: 100%;
+			}
+		</style>
+		
+		<link rel="stylesheet" type="text/css" href="component/navigation.css"/>
+		<script src="component/navigation.js" type="text/javascript" charset="utf-8"></script>
+		
+		<link rel="stylesheet" type="text/css" href="component/tabbar.css"/>
+		<script src="component/tabbar.js" type="text/javascript" charset="utf-8"></script>
+		
+	</head>
+	<body>
+		
+		<div id="app">
+			<!--导航栏-->
+			<navigation left-image="img/search.png" title="音乐" right-image="img/user.png"></navigation>
+			
+			
+			<!--页面容器-->
+			<div class="content">
+				
+			
+				<!--列表-->
+				<div class="list">
+					<div class="list-item" v-for="item in list">
+						<p>{{item.category}}</p>
+						<p>{{item.title}}</p>
+						<p>作者:{{item.author_name}}</p>
+						<p><img v-bind:src="imagePrefix+item.img_url"/></p>
+						<p>{{item.forward}}</p>
+						<p>发布时间: {{item.post_date}} 喜欢:{{item.like_count}}</p>
+					</div>
+				</div>
+			</div>
+				
+			<!--标签栏-->
+			<tabbar index="2"></tabbar>
+		</div>
+		
+		<script src="js/interface/interface.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			
+			var data = {
+				message:"12",
+				list:[],
+				imagePrefix:imagePrefix
+			}
+			
+			var app = new Vue({
+				el:"#app",
+				data:data,
+				created:function () {
+					
+					this.$http
+						.get(musicListUrl)
+						.then(function (r) {
+						var  downloadData = r.data;
+						this.list = downloadData.data;
+					})
+					
+				}
+			})
+			
+			
+		</script>
+		
+	</body>
+</html>
